@@ -3,6 +3,7 @@ import javafx.scene.control.*;
 
 public class Controller {
 
+    // declaring all the components for the layout
     @FXML
     private TextField plainText;
     @FXML
@@ -20,6 +21,7 @@ public class Controller {
     private void initialize() {
     }
 
+    //handler for encrypt button
     @FXML
     public void encryptButtonHandler(){
         String pText = plainText.getText();
@@ -27,6 +29,7 @@ public class Controller {
         encrypted.setText(Main.encrypt(pText, key));
     }
 
+    //handler for decrypt button
     @FXML
     public void decryptButtonHandler(){
         String cText = cypherText.getText();

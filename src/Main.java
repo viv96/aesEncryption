@@ -24,6 +24,7 @@ public class Main extends Application {
         loginStage(stage);
     }
 
+    //starting the scene
     private void loginStage(Stage stage) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/View.fxml"));
@@ -36,6 +37,7 @@ public class Main extends Application {
         }
     }
 
+    //expanding and dividing the key
     public static void setKey(String skey){
 
         try {
@@ -49,6 +51,7 @@ public class Main extends Application {
         }
     }
 
+    //method to encrypt the plaitext
     public static String encrypt(String text, String key){
         try{
             setKey(key);
@@ -61,6 +64,7 @@ public class Main extends Application {
         return null;
     }
 
+    //method to decrypt the cipher_keytext
     public static String decrypt(String text, String key){
         try{
             setKey(key);
