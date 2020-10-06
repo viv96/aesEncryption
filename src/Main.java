@@ -1,14 +1,15 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.*;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
+import java.io.IOException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Base64;
+
 
 public class Main extends Application {
 
@@ -17,7 +18,6 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 
     @Override
     public void start(Stage stage) {
@@ -46,7 +46,7 @@ public class Main extends Application {
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
             secretKey = new SecretKeySpec(key, "AES");
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -54,10 +54,19 @@ public class Main extends Application {
     //method to encrypt the plaitext
     public static String encrypt(String text, String key){
         try{
+            StringBuffer sb = new StringBuffer();
             setKey(key);
             Cipher cipherKey = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipherKey.init(Cipher.ENCRYPT_MODE,secretKey);
-            return Base64.getEncoder().encodeToString(cipherKey.doFinal(text.getBytes("UTF-8")));
+            byte[] encrypted = cipherKey.doFinal(text.getBytes());
+            for (int i = 0; i < encrypted.length; i++) {
+                String hex = Integer.toHexString(encrypted[i] & 0xFF);
+                if (hex.length() == 1){
+                    hex = '0' + hex;
+                }
+                sb.append(hex.toUpperCase());
+            }
+            return sb.toString();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -66,11 +75,21 @@ public class Main extends Application {
 
     //method to decrypt the cipher_keytext
     public static String decrypt(String text, String key){
+        if (text.length()<1){
+            return null;
+        }
+        byte[] t = new byte[text.length()/2];
+        for (int i = 0; i < text.length()/2; i++) {
+            int high = Integer.parseInt(text.substring(i*2,i*2+1),16);
+            int low = Integer.parseInt(text.substring(i*2+1, i*2+2), 16);
+            t[i] = (byte) (high*16+low);
+        }
         try{
             setKey(key);
             Cipher cipherKey = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipherKey.init(Cipher.DECRYPT_MODE,secretKey);
-            return new String(cipherKey.doFinal(Base64.getDecoder().decode(text)));
+            byte[] decrypt = cipherKey.doFinal(t);
+            return new String(decrypt);
         } catch (Exception e){
             e.printStackTrace();
         }
